@@ -218,16 +218,18 @@
   .photo{aspect-ratio:1/1;background:var(--panel-2);position:relative;overflow:hidden;display:grid;place-items:center}
   .photo img{width:100%;height:100%;object-fit:cover}
   .photo .placeholder{font-size:40px;opacity:.3}
-  /* ===== معرض صور متعدد ===== */
-  .gallery{position:relative;width:100%;height:100%;overflow:hidden}
-  .gallery .track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-  .gallery .track::-webkit-scrollbar{display:none}
-  .gallery .slide{flex:none;width:100%;height:100%;scroll-snap-align:center}
-  .gallery .slide img{width:100%;height:100%;object-fit:cover;display:block}
-  .gallery .dots{position:absolute;bottom:9px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none}
-  .gallery .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 1px 3px rgba(0,0,0,.4);transition:.2s}
-  .gallery .dot.on{background:#fff;width:18px;border-radius:4px}
-  .gallery .count{position:absolute;top:10px;inset-inline-end:10px;background:rgba(40,30,15,.62);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;display:flex;align-items:center;gap:4px;z-index:2}
+  /* ===== معرض صور متعدد (شريحة بالـ transform — موثوق في RTL) ===== */
+  .gallery{position:relative;width:100%;height:100%;overflow:hidden;direction:ltr}
+  .gallery .track{display:flex;height:100%;width:100%;transition:transform .3s ease;will-change:transform}
+  .gallery .slide{flex:0 0 100%;width:100%;height:100%}
+  .gallery .slide img{width:100%;height:100%;object-fit:cover;display:block;opacity:1}
+  .gallery .nav{position:absolute;top:0;bottom:0;width:38%;z-index:3;cursor:pointer;background:transparent;border:none;-webkit-tap-highlight-color:transparent}
+  .gallery .nav.prev{left:0}
+  .gallery .nav.next{right:0}
+  .gallery .dots{position:absolute;bottom:10px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none;z-index:4}
+  .gallery .dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.6);box-shadow:0 1px 4px rgba(0,0,0,.5);transition:.2s}
+  .gallery .dot.on{background:#fff;width:20px;border-radius:4px}
+  .gallery .count{position:absolute;top:10px;right:10px;background:rgba(40,30,15,.66);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;display:flex;align-items:center;gap:4px;z-index:4}
   .type-tag{inset-inline-end:auto;inset-inline-start:10px;top:auto;bottom:10px}
   .karat-tag{
     position:absolute;top:10px;inset-inline-start:10px;
@@ -458,21 +460,43 @@ function imgsOf(it){
 function galleryHTML(it){
   const imgs = imgsOf(it);
   if(!imgs.length) return `<div class="placeholder">${typeEmo(it.type)}</div>`;
-  if(imgs.length===1) return `<img src="${imgs[0]}" alt="${it.name}">`;
+  if(imgs.length===1) return `<img src="${imgs[0]}" alt="${it.name}" style="width:100%;height:100%;object-fit:cover">`;
   const slides = imgs.map(u=>`<div class="slide"><img src="${u}" alt="${it.name}"></div>`).join('');
   const dots = imgs.map((_,i)=>`<span class="dot ${i===0?'on':''}"></span>`).join('');
-  return `<div class="gallery" data-gid="${it.id}">
-    <div class="track" onscroll="galScroll(this,${it.id})">${slides}</div>
+  return `<div class="gallery" data-gid="${it.id}" data-n="${imgs.length}" data-i="0">
+    <div class="track">${slides}</div>
+    <button class="nav prev" onclick="galGo(${it.id},-1,event)" aria-label="السابق"></button>
+    <button class="nav next" onclick="galGo(${it.id},1,event)" aria-label="التالي"></button>
     <span class="count">📷 ${toAr(imgs.length)}</span>
     <div class="dots">${dots}</div>
   </div>`;
 }
-/* تحديث النقاط عند تمرير المعرض */
-window.galScroll = (track, id)=>{
-  const i = Math.round(track.scrollLeft / track.clientWidth);
-  const dots = track.parentNode.querySelectorAll('.dot');
-  dots.forEach((d,di)=> d.classList.toggle('on', di===Math.abs(i)));
+/* الانتقال بين الصور (أزرار أو سحب) */
+window.galGo = (id, dir, ev)=>{
+  if(ev){ ev.stopPropagation(); }
+  const g = document.querySelector(`.gallery[data-gid="${id}"]`); if(!g) return;
+  const n = +g.dataset.n; let i = +g.dataset.i;
+  i = (i + dir + n) % n;
+  g.dataset.i = i;
+  // RTL: الصورة الأولى يمين، نزيح بالـ translateX السالب
+  g.querySelector('.track').style.transform = `translateX(${-i*100}%)`;
+  g.querySelectorAll('.dot').forEach((d,di)=> d.classList.toggle('on', di===i));
 };
+/* دعم السحب باللمس */
+function attachSwipe(){
+  document.querySelectorAll('.gallery').forEach(g=>{
+    if(g.dataset.sw) return; g.dataset.sw='1';
+    let x0=null;
+    g.addEventListener('touchstart',e=>{ x0=e.touches[0].clientX; },{passive:true});
+    g.addEventListener('touchend',e=>{
+      if(x0===null) return;
+      const dx=e.changedTouches[0].clientX - x0; x0=null;
+      if(Math.abs(dx)<35) return;
+      // سحب لليسار = التالي، لليمين = السابق
+      galGo(+g.dataset.gid, dx<0?1:-1);
+    },{passive:true});
+  });
+}
 
 function renderBanner(){
   $('#live21').textContent = fmt(gramFor(21)+smith);
@@ -521,6 +545,7 @@ function renderGrid(){
       </div>
     </div>
   `).join('');
+  attachSwipe();
 }
 
 const WHATSAPP = '9647706599411';
