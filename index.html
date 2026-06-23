@@ -218,6 +218,17 @@
   .photo{aspect-ratio:1/1;background:var(--panel-2);position:relative;overflow:hidden;display:grid;place-items:center}
   .photo img{width:100%;height:100%;object-fit:cover}
   .photo .placeholder{font-size:40px;opacity:.3}
+  /* ===== معرض صور متعدد ===== */
+  .gallery{position:relative;width:100%;height:100%;overflow:hidden}
+  .gallery .track{display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .gallery .track::-webkit-scrollbar{display:none}
+  .gallery .slide{flex:none;width:100%;height:100%;scroll-snap-align:center}
+  .gallery .slide img{width:100%;height:100%;object-fit:cover;display:block}
+  .gallery .dots{position:absolute;bottom:9px;left:0;right:0;display:flex;justify-content:center;gap:5px;pointer-events:none}
+  .gallery .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.55);box-shadow:0 1px 3px rgba(0,0,0,.4);transition:.2s}
+  .gallery .dot.on{background:#fff;width:18px;border-radius:4px}
+  .gallery .count{position:absolute;top:10px;inset-inline-end:10px;background:rgba(40,30,15,.62);color:#fff;font-size:11px;font-weight:700;padding:3px 9px;border-radius:12px;display:flex;align-items:center;gap:4px;z-index:2}
+  .type-tag{inset-inline-end:auto;inset-inline-start:10px;top:auto;bottom:10px}
   .karat-tag{
     position:absolute;top:10px;inset-inline-start:10px;
     background:linear-gradient(180deg,var(--gold-2),var(--gold-deep));
@@ -334,11 +345,17 @@
     .seg{order:2;flex:1}
     .seg button{flex:1;padding:11px 6px}
     .btn-add{order:3;flex:none}
-    .grid{grid-template-columns:1fr;gap:12px}
-    .item{display:flex;align-items:stretch}
-    .photo{width:118px;flex:none;aspect-ratio:auto}
-    .item-body{flex:1;min-width:0;padding:13px 15px}
-    .karat-tag{font-size:10px;padding:4px 9px}
+    /* بطاقة عمودية: صورة كبيرة بالأعلى ومعلومات تحتها */
+    .grid{grid-template-columns:1fr;gap:16px}
+    .item{display:block}
+    .photo{width:100%;aspect-ratio:1/1}
+    .item-body{padding:15px 16px 16px}
+    .item-body h3{font-size:17px}
+    .karat-tag{font-size:11px;padding:5px 11px}
+  }
+  @media(min-width:561px){
+    /* شاشات أكبر: صورة كبيرة أيضًا فوق المعلومات */
+    .grid{grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
   }
   @media(max-width:380px){
     .pb-main .v{font-size:20px}
@@ -432,6 +449,30 @@ const fmtW = n => Number(n).toLocaleString('en-US',{minimumFractionDigits:2,maxi
 const toAr = n => String(n).replace(/[0-9]/g,d=>'٠١٢٣٤٥٦٧٨٩'[d]);
 const gramFor = k => gram * PURITY[k];
 const pieceTotal = it => gramFor(it.karat)*it.weight + smith*it.weight;
+/* قائمة صور القطعة: تدعم imgs (مصفوفة) أو img (نص قديم) */
+function imgsOf(it){
+  if(Array.isArray(it.imgs)) return it.imgs.filter(Boolean);
+  if(it.img) return [it.img];
+  return [];
+}
+function galleryHTML(it){
+  const imgs = imgsOf(it);
+  if(!imgs.length) return `<div class="placeholder">${typeEmo(it.type)}</div>`;
+  if(imgs.length===1) return `<img src="${imgs[0]}" alt="${it.name}">`;
+  const slides = imgs.map(u=>`<div class="slide"><img src="${u}" alt="${it.name}"></div>`).join('');
+  const dots = imgs.map((_,i)=>`<span class="dot ${i===0?'on':''}"></span>`).join('');
+  return `<div class="gallery" data-gid="${it.id}">
+    <div class="track" onscroll="galScroll(this,${it.id})">${slides}</div>
+    <span class="count">📷 ${toAr(imgs.length)}</span>
+    <div class="dots">${dots}</div>
+  </div>`;
+}
+/* تحديث النقاط عند تمرير المعرض */
+window.galScroll = (track, id)=>{
+  const i = Math.round(track.scrollLeft / track.clientWidth);
+  const dots = track.parentNode.querySelectorAll('.dot');
+  dots.forEach((d,di)=> d.classList.toggle('on', di===Math.abs(i)));
+};
 
 function renderBanner(){
   $('#live21').textContent = fmt(gramFor(21)+smith);
@@ -462,7 +503,7 @@ function renderGrid(){
   grid.innerHTML = list.map(it=>`
     <div class="item" data-id="${it.id}">
       <div class="photo">
-        ${it.img ? `<img src="${it.img}" alt="${it.name}">` : `<div class="placeholder">${typeEmo(it.type)}</div>`}
+        ${galleryHTML(it)}
         <span class="karat-tag">عيار ${toAr(it.karat)}</span>
         ${it.type ? `<span class="type-tag">${typeName(it.type)}</span>` : ''}
       </div>
