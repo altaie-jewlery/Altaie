@@ -216,13 +216,13 @@
   }
   .item:active{transform:scale(.985)}
   .photo{aspect-ratio:1/1;background:var(--panel-2);position:relative;overflow:hidden;display:grid;place-items:center}
-  .photo img{width:100%;height:100%;object-fit:cover}
+  .photo img{width:100%;height:100%;object-fit:cover;filter:contrast(1.08) saturate(1.12) brightness(.98)}
   .photo .placeholder{font-size:40px;opacity:.3}
   /* ===== معرض صور متعدد (شريحة بالـ transform — موثوق في RTL) ===== */
   .gallery{position:relative;width:100%;height:100%;overflow:hidden;direction:ltr}
   .gallery .track{display:flex;height:100%;width:100%;transition:transform .3s ease;will-change:transform}
   .gallery .slide{flex:0 0 100%;width:100%;height:100%}
-  .gallery .slide img{width:100%;height:100%;object-fit:cover;display:block;opacity:1}
+  .gallery .slide img{width:100%;height:100%;object-fit:cover;display:block;opacity:1;filter:contrast(1.08) saturate(1.12) brightness(.98)}
   .gallery .nav{position:absolute;top:0;bottom:0;width:38%;z-index:3;cursor:pointer;background:transparent;border:none;-webkit-tap-highlight-color:transparent}
   .gallery .nav.prev{left:0}
   .gallery .nav.next{right:0}
