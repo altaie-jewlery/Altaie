@@ -2,59 +2,11 @@
   "gram": 135000,
   "smith": 3000,
   "items": [
-    {
-      "id": 1,
-      "name": "خاتم سوليتير",
-      "weight": 5.2,
-      "karat": 21,
-      "type": "ring",
-      "origin": "iraqi",
-      "imgs": []
-    },
-    {
-      "id": 2,
-      "name": "سوار كليوباترا",
-      "weight": 18.6,
-      "karat": 21,
-      "type": "bracelet",
-      "origin": "italian",
-      "imgs": []
-    },
-    {
-      "id": 3,
-      "name": "طقم عروس مرصّع",
-      "weight": 62.4,
-      "karat": 18,
-      "type": "set",
-      "origin": "gulf",
-      "imgs": []
-    },
-    {
-      "id": 4,
-      "name": "ليرة ذهب رشادي",
-      "weight": 7.2,
-      "karat": 24,
-      "type": "coin",
-      "origin": "iraqi",
-      "imgs": []
-    },
-    {
-      "id": 5,
-      "name": "سلسلة ناعمة",
-      "weight": 9.8,
-      "karat": 18,
-      "type": "necklace",
-      "origin": "italian",
-      "imgs": []
-    },
-    {
-      "id": 6,
-      "name": "حلق دائري كلاسيك",
-      "weight": 4.1,
-      "karat": 21,
-      "type": "earring",
-      "origin": "iraqi",
-      "imgs": []
-    }
+    { "id": 1, "name": "خاتم سوليتير", "weight": 5.2, "karat": 21, "type": "ring", "origin": "iraqi", "imgs": [] },
+    { "id": 2, "name": "سوار كليوباترا", "weight": 18.6, "karat": 21, "type": "bracelet", "origin": "italian", "imgs": [] },
+    { "id": 3, "name": "طقم عروس مرصّع", "weight": 62.4, "karat": 18, "type": "set", "origin": "gulf", "imgs": [] },
+    { "id": 4, "name": "ليرة ذهب رشادي", "weight": 7.2, "karat": 24, "type": "coin", "origin": "iraqi", "imgs": [] },
+    { "id": 5, "name": "سلسلة ناعمة", "weight": 9.8, "karat": 18, "type": "necklace", "origin": "italian", "imgs": [] },
+    { "id": 6, "name": "حلق دائري كلاسيك", "weight": 4.1, "karat": 21, "type": "earring", "origin": "iraqi", "imgs": [] }
   ]
 }
