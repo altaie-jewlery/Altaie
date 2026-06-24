@@ -3,19 +3,6 @@
   "smith": 3000,
   "items": [
     {
-      "id": 1782240823833,
-      "name": "تخم عروس",
-      "weight": 12,
-      "karat": 21,
-      "type": "set",
-      "origin": "italian",
-      "imgs": [
-        "https://altaie-jewlery.github.io/Altaie/images/1782310585328-cau235.jpg",
-        "https://altaie-jewlery.github.io/Altaie/images/1782310586845-i2r4ex.jpg",
-        "https://altaie-jewlery.github.io/Altaie/images/1782310588359-qvlo8l.jpg"
-      ]
-    },
-    {
       "id": 1,
       "name": "خاتم سوليتير",
       "weight": 5.2,
